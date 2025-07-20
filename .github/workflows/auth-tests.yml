@@ -1,0 +1,43 @@
+name: Authentication Tests
+
+on:
+  pull_request:
+    paths:
+      - 'backend/auth/**'
+      - 'frontend/src/Login.*'
+  push:
+    branches:
+      - main
+
+jobs:
+  test-auth:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: |
+        go mod download
+        npm ci
+    
+    - name: Run backend auth tests
+      run: go test ./backend/auth/...
+    
+    - name: Run frontend tests
+      run: npm test -- --coverage
+    
+    - name: Security scan
+      run: |
+        echo "Running security checks on authentication code..."
+        # Add actual security scanning tools here
